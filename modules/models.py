@@ -444,14 +444,10 @@ def RWKV_loader(model_name):
 ### inf2 neuron loader
 def neuron_loader(model_name):
         from transformers_neuronx.llama.model import LlamaForSampling
-        path_to_model = Path(f'{shared.args.model_dir}/{model_name}/
-    model')
-        path_to_neuron = Path(f'{shared.args.model_dir}/{model_name}/
-    neuron_artifacts')
-        path_to_tokenizer = Path(f'{shared.args.model_dir}/
-    {model_name}/tokenizer')
-        model = LlamaForSampling.from_pretrained(path_to_model,
-    batch_size=1, tp_degree=12, amp='f16')
+        path_to_model = Path(f'{shared.args.model_dir}/{model_name}/model')
+        path_to_neuron = Path(f'{shared.args.model_dir}/{model_name}/neuron_artifacts')
+        path_to_tokenizer = Path(f'{shared.args.model_dir}/{model_name}/tokenizer')
+        model = LlamaForSampling.from_pretrained(path_to_model,batch_size=1, tp_degree=12, amp='f16')
         model.load(path_to_neuron) # Load the compiled Neuron artifacts
         model.to_neuron() # will skip compile
         tokenizer = AutoTokenizer.from_pretrained(path_to_tokenizer)
