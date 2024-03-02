@@ -49,6 +49,8 @@ def _generate_reply(question, state, stopping_strings=None, is_chat=False, escap
 
         if shared.model.__class__.__name__ in ['LlamaCppModel', 'RWKVModel', 'ExllamaModel', 'Exllamav2Model', 'CtransformersModel']:
             generate_func = generate_reply_custom
+        elif shared.args.loader == 'Neuron':
+            generate_func = generate_reply_neuron
         else:
             generate_func = generate_reply_HF
 
@@ -78,7 +80,7 @@ def _generate_reply(question, state, stopping_strings=None, is_chat=False, escap
     is_stream = state['stream']
     if len(all_stop_strings) > 0 and not state['stream']:
         state = copy.deepcopy(state)
-        state['stream'] = True
+        state['stream'] = False
 
     # Generate
     for reply in generate_func(question, original_question, seed, state, stopping_strings, is_chat=is_chat):
@@ -388,6 +390,16 @@ def generate_reply_HF(question, original_question, seed, state, stopping_strings
         new_tokens = len(output) - (original_tokens if not shared.is_seq2seq else 0)
         print(f'Output generated in {(t1-t0):.2f} seconds ({new_tokens/(t1-t0):.2f} tokens/s, {new_tokens} tokens, context {original_tokens}, seed {seed})')
         return
+
+def generate_reply_neuron(question, original_question, seed, state, stopping_strings=None, is_chat=False):
+    """
+    For nueron models that use the transformers neuron library for sampling
+    """
+    input_ids = encode(question, add_bos_token=state['add_bos_token'], truncation_length=get_max_prompt_length(state))
+    with torch.inference_mode():
+          output = shared.model.sample(generate_params['inputs'],sequence_length=512, top_k=1)
+          starting_from = 0 if shared.is_seq2seq else len(input_ids[0])
+          yield get_reply_from_output_ids(output[0], state,starting_from=starting_from)
 
 
 def generate_reply_custom(question, original_question, seed, state, stopping_strings=None, is_chat=False):

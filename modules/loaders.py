@@ -165,6 +165,8 @@ loaders_and_params = OrderedDict({
         'hqq_backend',
         'trust_remote_code',
         'no_use_fast',
+    ],
+    'Neuron':[
     ]
 })
 
