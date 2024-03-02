@@ -170,6 +170,11 @@ loaders_and_params = OrderedDict({
     ]
 })
 
+def neuron_samplers():
+    return {
+      'sequence_length',
+      'top_k',
+    }
 
 def transformers_samplers():
     return {
@@ -218,6 +223,7 @@ loaders_samplers = {
     'AutoAWQ': transformers_samplers(),
     'QuIP#': transformers_samplers(),
     'HQQ': transformers_samplers(),
+    'Neuron': neuron_samplers(),
     'ExLlama_HF': {
         'temperature',
         'temperature_last',
