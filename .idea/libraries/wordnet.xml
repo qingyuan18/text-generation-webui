@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="wordnet">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/extensions/superboogav2/nltk_data/corpora/wordnet.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

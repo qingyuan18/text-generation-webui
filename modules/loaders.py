@@ -172,7 +172,7 @@ loaders_and_params = OrderedDict({
 
 def neuron_samplers():
     return {
-      'sequence_length',
+      'max_seq_len',
       'top_k',
     }
 

@@ -145,7 +145,8 @@ def encode(prompt, add_special_tokens=True, add_bos_token=True, truncation_lengt
         return input_ids.to("xpu:0")
     else:
         #return input_ids.cuda()
-        return input_ids.to(xm.xla_device())
+        #return input_ids.to(xm.xla_device())
+        return input_ids
 
 
 def decode(output_ids, skip_special_tokens=True):
@@ -396,8 +397,9 @@ def generate_reply_neuron(question, original_question, seed, state, stopping_str
     For nueron models that use the transformers neuron library for sampling
     """
     input_ids = encode(question, add_bos_token=state['add_bos_token'], truncation_length=get_max_prompt_length(state))
+    question, input_ids, inputs_embeds = apply_extensions('tokenizer', state, question, input_ids, None)
     with torch.inference_mode():
-          output = shared.model.sample(generate_params['inputs'],sequence_length=512, top_k=1)
+          output = shared.model.sample(input_ids,sequence_length=512, top_k=1)
           starting_from = 0 if shared.is_seq2seq else len(input_ids[0])
           yield get_reply_from_output_ids(output[0], state,starting_from=starting_from)
 
