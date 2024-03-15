@@ -360,6 +360,7 @@ def generate_reply_HF(question, original_question, seed, state, stopping_strings
 
             def generate_with_callback(callback=None, *args, **kwargs):
                 kwargs['stopping_criteria'].append(Stream(callback_func=callback))
+                kwargs['sequence_length']=kwargs['max_new_tokens']
                 clear_torch_cache()
                 with torch.no_grad():
                     shared.model.generate(**kwargs)
@@ -400,8 +401,9 @@ def generate_reply_neuron(question, original_question, seed, state, stopping_str
     question, input_ids, inputs_embeds = apply_extensions('tokenizer', state, question, input_ids, None)
     print(f"max_seq_len is :{shared.args.max_seq_len}")
     print(f"top_k is :{state['top_k']}")
+    print(f"sequence_length is:{state['max_new_tokens']}")
     with torch.inference_mode():
-          output = shared.model.sample(input_ids,sequence_length=shared.args.max_seq_len, top_k=state['top_k'])
+          output = shared.model.sample(input_ids,sequence_length=state['max_new_tokens'], top_k=state['top_k'])
           starting_from = 0 if shared.is_seq2seq else len(input_ids[0])
           yield get_reply_from_output_ids(output[0], state,starting_from=starting_from)
 
